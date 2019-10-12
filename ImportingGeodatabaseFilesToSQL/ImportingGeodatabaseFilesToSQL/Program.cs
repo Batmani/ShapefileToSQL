@@ -23,13 +23,12 @@ namespace ImportingGeoDatabaseToSQL
     {
         static void Main(string[] args)
         {
-            //
-           
+            ImportShapeFileIntoDatabase("path\\to\\shapefile")
         }
 
-        public static void ImportShapeFileIntoDatabase()
+        public static void ImportShapeFileIntoDatabase(string filePath)
         {
-            ShapeDataReader reader = new ShapeDataReader("Path to Shape file");
+            ShapeDataReader reader = new ShapeDataReader(filePath);
 
             GeometryFactory factory = new GeometryFactory();
             ShapefileDataReader shapeFileData = new ShapefileDataReader("C:\\Users\\Batmani\\Downloads\\100_NY_Parishes(C38727)\\100_NY_Parishes\\RiponParishes.shp", factory);
@@ -40,7 +39,7 @@ namespace ImportingGeoDatabaseToSQL
             IShapefileFeature[] rowInformation = result.ToArray();
 
             //CREATE TABLE COLUMNS
-            RunSqlQuery(CreateTableColumns(columnAttributes, fieldsInformation)); //currently just returns the create table query string
+            RunSqlQuery(CreateTableColumns(columnAttributes, fieldsInformation));
 
             //INSERTING TABLE VALUES
             InsertTableValues(result.Count(), rowInformation).ForEach(x => RunSqlQuery(x));
@@ -59,7 +58,6 @@ namespace ImportingGeoDatabaseToSQL
             columnInformation = columnInformation.TrimEnd(',', ' ');
 
             string createTableString = "CREATE TABLE TestTable ( OBJECTID_1 int IDENTITY (1,1) PRIMARY KEY, Shape geometry, " + columnInformation + "); ";
-            //Working - Consider making OBJECTID_1 a variable?
 
             return createTableString;
         }
@@ -84,7 +82,7 @@ namespace ImportingGeoDatabaseToSQL
                     }
 
                 }
-                string insertRowDataQuery = "INSERT INTO TestTable VALUES ( geometry::STPolyFromText('" + geometryValue + "'," + geometryValue.SRID + " ), " + valueString.TrimEnd(',', ' ') + ");"; //Working - STPolyFromText if not WKT?
+                string insertRowDataQuery = "INSERT INTO TestTable VALUES ( geometry::STPolyFromText('" + geometryValue + "'," + geometryValue.SRID + " ), " + valueString.TrimEnd(',', ' ') + ");";
                 rowSqlQueries.Add(insertRowDataQuery);
             }
 
@@ -94,7 +92,6 @@ namespace ImportingGeoDatabaseToSQL
         public static string SetSqlDataType(int length, int decimalCount, char dbPrefix)
         {
             //CLR type to SQL data type
-
             if (dbPrefix.Equals('N'))
             {
                 if (decimalCount == 0)
@@ -139,7 +136,7 @@ namespace ImportingGeoDatabaseToSQL
                 return "Date";
             }
 
-            if (dbPrefix.Equals('B')) //blob
+            if (dbPrefix.Equals('B'))
             {
                 return "geometry object";
             }
@@ -150,7 +147,7 @@ namespace ImportingGeoDatabaseToSQL
 
         public static void RunSqlQuery(string query)
         {
-            using (SqlConnection connection = new SqlConnection(""))
+            using (SqlConnection connection = new SqlConnection("SQLServerconnectionstring\\ToyourDatabase"))
             {
                 connection.Open();
                 SqlCommand command = new SqlCommand(query, connection);
