@@ -31,7 +31,7 @@ namespace ImportingGeoDatabaseToSQL
             ShapeDataReader reader = new ShapeDataReader(filePath);
 
             GeometryFactory factory = new GeometryFactory();
-            ShapefileDataReader shapeFileData = new ShapefileDataReader("C:\\Users\\Batmani\\Downloads\\100_NY_Parishes(C38727)\\100_NY_Parishes\\RiponParishes.shp", factory);
+            ShapefileDataReader shapeFileData = new ShapefileDataReader("", factory);
             DbaseFieldDescriptor[] fieldsInformation = shapeFileData.DbaseHeader.Fields;
             Envelope mb = reader.ShapefileBounds;
             IEnumerable<IShapefileFeature> result = reader.ReadByMBRFilter(mb);
